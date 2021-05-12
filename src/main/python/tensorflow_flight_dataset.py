@@ -25,9 +25,9 @@ class ArrowFlightDataset(object):
         import tensorflow as tf
         import tensorflow_io.arrow as arrow_io
 
-        # proc = start_flight_to_stream(host, port, flight_descriptor)
+        proc = start_flight_to_stream(host, port, flight_descriptor)
 
         dataset = arrow_io.ArrowStreamDataset.from_schema('127.0.0.1:8889', arrow_schema)
 
-        # dataset.proc = proc
+        dataset.proc = proc
         return dataset

@@ -1,4 +1,5 @@
 import subprocess
+import time
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, rand
@@ -27,7 +28,8 @@ def main():
         .appName('spark-flight') \
         .getOrCreate()
 
-    df = spark.read.format("avro").load("file:///Users/vsowrira/tf-avro")
+    start_time = time.time()
+    df = spark.read.format("avro").load("file:///Users/vsowrira/git/test_vary_parallel_read_calls-16-8-16-1/")
 
     # Put the Spark DataFrame to the Flight Service
     SparkFlightConnector.put(df, host, port, flight_desc)
@@ -37,6 +39,7 @@ def main():
     # ------------------------------------------------------------- #
 
     # Connect to the Flight service and get endpoints from FlightInfo
+    '''
     client = pa_flight.connect((host, int(port)))
     desc = pa_flight.FlightDescriptor.for_path(flight_desc)
     info = client.get_flight_info(desc)
@@ -53,6 +56,7 @@ def main():
     table = pa.concat_tables(tables)
     pdf = table.to_pandas()
     print("DataFrame from Flight streams:\n %", pdf)
+    '''
 
     # ------------------------------------------------------------- #
     # Create tf.data.Dataset to iterate over Arrow data from Flight #
@@ -68,9 +72,14 @@ def main():
     if have_tensorflow:
         from tensorflow_flight_dataset import ArrowFlightDataset
         dataset = ArrowFlightDataset.from_schema(host, port, flight_desc, to_arrow_schema(df.schema))
+        count = 0
         for row in dataset:
-            print(row)
+            if count < 10:
+                print(row)
+                count = count + 1
         dataset.proc.terminate()
+
+    print("Total time taken to read avro data in TF using Spark with Arrow:", (time.time() - start_time))
 
     spark.stop()
 
