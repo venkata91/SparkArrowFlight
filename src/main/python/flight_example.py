@@ -27,10 +27,7 @@ def main():
         .appName('spark-flight') \
         .getOrCreate()
 
-    df = spark.range(10) \
-        .select((col('id') % 2).alias('label')).withColumn('data', rand())
-
-    df.show(10)
+    df = spark.read.format("avro").load("file:///Users/vsowrira/tf-avro")
 
     # Put the Spark DataFrame to the Flight Service
     SparkFlightConnector.put(df, host, port, flight_desc)
@@ -55,7 +52,7 @@ def main():
     # Convert Tables to a single Pandas DataFrame
     table = pa.concat_tables(tables)
     pdf = table.to_pandas()
-    print(f"DataFrame from Flight streams:\n{pdf}")
+    print("DataFrame from Flight streams:\n %", pdf)
 
     # ------------------------------------------------------------- #
     # Create tf.data.Dataset to iterate over Arrow data from Flight #

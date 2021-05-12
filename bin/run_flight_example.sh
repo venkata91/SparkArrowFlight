@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #SPARK_HOME=$HOME/git/spark
-#SPARK_SUBMIT=$SPARK_HOME/bin/spark-submit
+SPARK_SUBMIT=$SPARK_HOME/bin/spark-submit
+echo $SPARK_HOME
 
-SPARK_SUBMIT=spark-submit
 M2_LOCAL_REPO=$HOME/.m2/repository
 
 PYSPARK_PYTHON=`which python` $SPARK_SUBMIT \
